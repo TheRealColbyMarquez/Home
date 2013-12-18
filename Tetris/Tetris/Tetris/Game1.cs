@@ -19,6 +19,8 @@ namespace TetrisDemo
         OFFSCREEN
     }
 
+    enum GameStates { TitleScreen, Playing, GameOver };
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -28,7 +30,8 @@ namespace TetrisDemo
         const int BoardHeight = 20; // Board height in blocks
         const int BlockSize = 20;   // Block size in pixels
 
-        enum GameStates { TitleScreen, Playing, GameOver };
+        GameStates gameState = GameStates.TitleScreen;
+
         Texture2D titleScreen;
         Texture2D spriteSheet;
         Score score;
@@ -45,7 +48,7 @@ namespace TetrisDemo
         Vector2 BoardLocation;
         private Vector2 scoreLocation = new Vector2(225, 25);
         private Vector2 linesLocation = new Vector2(225, 50);
-        private Vector2 titleScreenLocation = new Vector2(-212, -480);
+        private Vector2 titleScreenLocation = new Vector2(-450, -480);
 
 
 
@@ -351,81 +354,89 @@ namespace TetrisDemo
 
             KeyboardState ks = Keyboard.GetState();
 
-
-
-
-
-            if (KeyBoardElapsedTime > 200)
+            if (gameState == GameStates.TitleScreen)
             {
-                if (ks.IsKeyDown(Keys.Left) || ks.IsKeyDown(Keys.Right))
+                if (ks.IsKeyDown(Keys.Space))
                 {
-                    // Create a new location that contains where we WANT to move the piece
-                    Vector2 NewSpawnedPieceLocation = SpawnedPieceLocation + new Vector2(ks.IsKeyDown(Keys.Left) ? -1 : 1, 0);
-
-                    // Next, check to see if we can actually place the piece there
-                    PlaceStates ps = CanPlace(Board, SpawnedPiece, (int)NewSpawnedPieceLocation.X, (int)NewSpawnedPieceLocation.Y);
-                    if (ps == PlaceStates.CAN_PLACE)
-                    {
-                        SpawnedPieceLocation = NewSpawnedPieceLocation;
-
-                    }
-
-                    KeyBoardElapsedTime = 0;
-                }
- 
-                if (ks.IsKeyDown(Keys.Up))
-                {
-                    int[,] newSpawnedPiece = Rotate(SpawnedPiece, true);
-
-                    PlaceStates ps = CanPlace(Board, newSpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
-                    if (ps == PlaceStates.CAN_PLACE)
-                    {
-                        SpawnedPiece = newSpawnedPiece;
-                    }
-
-                    KeyBoardElapsedTime = 0;
-                }
-
-
-                if (ks.IsKeyDown(Keys.Down))
-                {
-                    ElapsedTime = StepTime + 1;
-                    KeyBoardElapsedTime = 175;
-                    score.PlayerScore += 3;
+                    gameState = GameStates.Playing;
                 }
             }
-
-            // If the accumulated time over the last couple Update() method calls exceeds our StepTime variable
-            if (ElapsedTime > StepTime)
+            else if (gameState == GameStates.Playing)
             {
-                // Create a new location for this spawned piece to go to on the next update
-                Vector2 NewSpawnedPieceLocation = SpawnedPieceLocation + new Vector2(0, 1);
 
-                // Now check to see if we can place the piece at that new location
-                PlaceStates ps = CanPlace(Board, SpawnedPiece, (int)NewSpawnedPieceLocation.X, (int)NewSpawnedPieceLocation.Y);
-                if (ps != PlaceStates.CAN_PLACE)
+
+                if (KeyBoardElapsedTime > 200)
                 {
-                    // We can't move down any further, so place the piece where it is currently
-                    Place(Board, SpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
-                    SpawnPiece();
-
-                    // This is just a check to see if the newly spawned piece is already blocked, in which case the 
-                    // game is over
-                    ps = CanPlace(Board, SpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
-                    if (ps == PlaceStates.BLOCKED)
+                    if (ks.IsKeyDown(Keys.Left) || ks.IsKeyDown(Keys.Right))
                     {
-                        // Game over.. normally we would change a game state variable but for this tutorial we're just
-                        // going to exit the app
-                        this.Exit();
+                        // Create a new location that contains where we WANT to move the piece
+                        Vector2 NewSpawnedPieceLocation = SpawnedPieceLocation + new Vector2(ks.IsKeyDown(Keys.Left) ? -1 : 1, 0);
+
+                        // Next, check to see if we can actually place the piece there
+                        PlaceStates ps = CanPlace(Board, SpawnedPiece, (int)NewSpawnedPieceLocation.X, (int)NewSpawnedPieceLocation.Y);
+                        if (ps == PlaceStates.CAN_PLACE)
+                        {
+                            SpawnedPieceLocation = NewSpawnedPieceLocation;
+
+                        }
+
+                        KeyBoardElapsedTime = 0;
+                    }
+
+                    if (ks.IsKeyDown(Keys.Up))
+                    {
+                        int[,] newSpawnedPiece = Rotate(SpawnedPiece, true);
+
+                        PlaceStates ps = CanPlace(Board, newSpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
+                        if (ps == PlaceStates.CAN_PLACE)
+                        {
+                            SpawnedPiece = newSpawnedPiece;
+                        }
+
+                        KeyBoardElapsedTime = 0;
+                    }
+
+
+                    if (ks.IsKeyDown(Keys.Down))
+                    {
+                        ElapsedTime = StepTime + 1;
+                        KeyBoardElapsedTime = 175;
+                        score.PlayerScore += 3;
                     }
                 }
-                else
-                {
-                    // We can move our piece into the new location, so update the existing piece location
-                    SpawnedPieceLocation = NewSpawnedPieceLocation;
-                }
 
-                ElapsedTime = 0;
+                // If the accumulated time over the last couple Update() method calls exceeds our StepTime variable
+                if (ElapsedTime > StepTime)
+                {
+                    // Create a new location for this spawned piece to go to on the next update
+                    Vector2 NewSpawnedPieceLocation = SpawnedPieceLocation + new Vector2(0, 1);
+
+                    // Now check to see if we can place the piece at that new location
+                    PlaceStates ps = CanPlace(Board, SpawnedPiece, (int)NewSpawnedPieceLocation.X, (int)NewSpawnedPieceLocation.Y);
+                    if (ps != PlaceStates.CAN_PLACE)
+                    {
+                        // We can't move down any further, so place the piece where it is currently
+                        Place(Board, SpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
+                        SpawnPiece();
+
+                        // This is just a check to see if the newly spawned piece is already blocked, in which case the 
+                        // game is over
+                        ps = CanPlace(Board, SpawnedPiece, (int)SpawnedPieceLocation.X, (int)SpawnedPieceLocation.Y);
+                        if (ps == PlaceStates.BLOCKED)
+                        {
+                            // Game over.. normally we would change a game state variable but for this tutorial we're just
+                            // going to exit the app
+                            gameState = GameStates.GameOver;
+                        }
+                    }
+                    else
+                    {
+                        // We can move our piece into the new location, so update the existing piece location
+                        SpawnedPieceLocation = NewSpawnedPieceLocation;
+                    }
+
+                    ElapsedTime = 0;
+                }
             }
 
             base.Update(gameTime);
@@ -441,54 +452,78 @@ namespace TetrisDemo
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(titleScreen, titleScreenLocation, Color.White);
 
-            // Draw the board first
-            for (int y = 0; y < BoardHeight; y++)
-                for (int x = 0; x < BoardWidth; x++)
-                {
-                    Color tintColor = TetronimoColors[Board[x, y]];
+            if (gameState == GameStates.TitleScreen)
+            {
+                spriteBatch.Draw(titleScreen, titleScreenLocation, Color.White);
 
-                    // Since for the board itself background colors are transparent, we'll go ahead and give this one
-                    // a custom color.  This can be omitted if you draw a background image underneath your board
-                    if (Board[x, y] == 0)
-                        tintColor = Color.FromNonPremultiplied(50, 50, 50, 50);
+                spriteBatch.DrawString(
+                    pericles14,
+                    "P R E S S  S P A C E  T O  C O N T I N U E",
+                    new Vector2(200,225),
+                    Color.White);
 
-                    spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + x * BlockSize, (int)BoardLocation.Y + y * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
-                }
+            }
+            else if (gameState == GameStates.Playing)
+            {
 
-            // Next draw the spawned piece
-            int dim = SpawnedPiece.GetLength(0);
-
-            for (int y = 0; y < dim; y++)
-                for (int x = 0; x < dim; x++)
-                {
-                    if (SpawnedPiece[x, y] != 0)
+                // Draw the board first
+                for (int y = 0; y < BoardHeight; y++)
+                    for (int x = 0; x < BoardWidth; x++)
                     {
-                        Color tintColor = TetronimoColors[SpawnedPiece[x, y]];
+                        Color tintColor = TetronimoColors[Board[x, y]];
 
-                        spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + ((int)SpawnedPieceLocation.X + x) * BlockSize, (int)BoardLocation.Y + ((int)SpawnedPieceLocation.Y + y) * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
+                        // Since for the board itself background colors are transparent, we'll go ahead and give this one
+                        // a custom color.  This can be omitted if you draw a background image underneath your board
+                        if (Board[x, y] == 0)
+                            tintColor = Color.FromNonPremultiplied(50, 50, 50, 50);
+
+                        spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + x * BlockSize, (int)BoardLocation.Y + y * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
                     }
+
+                // Next draw the spawned piece
+                int dim = SpawnedPiece.GetLength(0);
+
+                for (int y = 0; y < dim; y++)
+                    for (int x = 0; x < dim; x++)
+                    {
+                        if (SpawnedPiece[x, y] != 0)
+                        {
+                            Color tintColor = TetronimoColors[SpawnedPiece[x, y]];
+
+                            spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + ((int)SpawnedPieceLocation.X + x) * BlockSize, (int)BoardLocation.Y + ((int)SpawnedPieceLocation.Y + y) * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
+                        }
+                    }
+                if (score.PlayerScore >= 0)
+                {
+                    spriteBatch.DrawString(
+                        pericles14,
+                        "Score: " + score.PlayerScore.ToString(),
+                        scoreLocation,
+                        Color.White);
                 }
-            if (score.PlayerScore >= 0)
+
+                if (score.PlayerLines >= 0)
+                {
+                    spriteBatch.DrawString(
+                        pericles14,
+                        "Lines: " + score.PlayerLines.ToString(),
+                        linesLocation,
+                        Color.White);
+                }
+            }
+
+            else if ((gameState == GameStates.GameOver))
             {
                 spriteBatch.DrawString(
                     pericles14,
-                    "Score: " + score.PlayerScore.ToString(),
-                    scoreLocation,
+                    "G A M E  O V E R !",
+                    new Vector2(
+                        this.Window.ClientBounds.Width / 2 -
+                          pericles14.MeasureString("G A M E  O V E R !").X / 2,
+                        50),
                     Color.White);
             }
-
-            if (score.PlayerLines >= 0)
-            {
-                spriteBatch.DrawString(
-                    pericles14,
-                    "Lines: " + score.PlayerLines.ToString(),
-                    linesLocation,
-                    Color.White);
-            }
-
-            
 
             spriteBatch.End();
 

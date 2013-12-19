@@ -48,6 +48,7 @@ namespace TetrisDemo
         Vector2 BoardLocation;
         private Vector2 scoreLocation = new Vector2(225, 25);
         private Vector2 linesLocation = new Vector2(225, 50);
+        private Vector2 levelLocation = new Vector2(225, 75);
         private Vector2 titleScreenLocation = new Vector2(-450, -480);
 
 
@@ -172,8 +173,6 @@ namespace TetrisDemo
 
             SoundManager.Initialize(Content);
             SoundManager.PlayGameMusic();
-            
-            
 
 
         }
@@ -347,8 +346,10 @@ namespace TetrisDemo
             ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
             KeyBoardElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
-
-            
+            if (score.PlayerLines >= 1)
+            {
+                score.PlayerLevel = score.PlayerLines / 5;
+            }
 
             
 
@@ -401,7 +402,7 @@ namespace TetrisDemo
                     {
                         ElapsedTime = StepTime + 1;
                         KeyBoardElapsedTime = 175;
-                        score.PlayerScore += 3;
+                        score.PlayerScore += 1;
                     }
                 }
 
@@ -446,12 +447,13 @@ namespace TetrisDemo
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// 
         protected override void Draw(GameTime gameTime)
         {
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-
 
             if (gameState == GameStates.TitleScreen)
             {
@@ -507,8 +509,17 @@ namespace TetrisDemo
                 {
                     spriteBatch.DrawString(
                         pericles14,
-                        "Lines: " + score.PlayerLines.ToString(),
+                       ( "Lines: ") + score.PlayerLines.ToString(),
                         linesLocation,
+                        Color.White);
+                }
+
+                if (score.PlayerLevel >= 0)
+                {
+                    spriteBatch.DrawString(
+                        pericles14,
+                        ("Level: ") + score.PlayerLevel.ToString(),
+                        levelLocation,
                         Color.White);
                 }
             }
@@ -529,6 +540,8 @@ namespace TetrisDemo
 
             base.Draw(gameTime);
         }
+
+        public int device { get; set; }
     }
 }
 

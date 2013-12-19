@@ -15,6 +15,7 @@ namespace TetrisDemo
     {
         public long PlayerScore = 0;
         public long PlayerLines = 0;
+        public long PlayerLevel = 0;
 
     }
 }

@@ -30,7 +30,7 @@ namespace TetrisDemo
         public static void PlayGameMusic()
         {
             IsMusicPlaying = true;
-            MediaPlayer.Play(gameMusic);
+            //MediaPlayer.Play(gameMusic);
 
         }
     }

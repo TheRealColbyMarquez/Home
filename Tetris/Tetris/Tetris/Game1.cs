@@ -169,7 +169,7 @@ namespace TetrisDemo
 
             // TODO: use this.Content to load your game content here
             spriteSheet = Content.Load<Texture2D>(@"TetrisSprites");
-            titleScreen = Content.Load<Texture2D>(@"tetristitle15");
+            titleScreen = Content.Load<Texture2D>(@"tetristitle17");
             pericles14 = Content.Load<SpriteFont>("Pericles14");
 
 
@@ -320,6 +320,9 @@ namespace TetrisDemo
                 {
                     score.PlayerScore += 500;
                     score.PlayerLines += 1;
+                    score.PlayerLevel = score.PlayerLines / 5;
+                    StepTime = 300 - (int)score.PlayerLevel * 10;
+
                     // Row y needs to go bye bye
                     // Copy row y-1 to row y
                     for (int yc = y; yc > 0; yc--)
@@ -352,11 +355,27 @@ namespace TetrisDemo
             ElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
             KeyBoardElapsedTime += gameTime.ElapsedGameTime.Milliseconds;
 
-            if (score.PlayerLines >= 1)
-            {
-                score.PlayerLevel = score.PlayerLines / 5;
-            }
+           
 
+  //          if (score.PlayerLevel == 2)
+ //           {
+ //               
+ //           }
+//
+ //           if (score.PlayerLevel == 3)
+ //           {
+ //               
+ //           }
+//
+ //           if (score.PlayerLevel == 4)
+ //           {
+ //               
+ //           }
+//
+//            if (score.PlayerLevel == 5)
+  //          {
+  //              
+   //         }
             
 
             KeyboardState ks = Keyboard.GetState();

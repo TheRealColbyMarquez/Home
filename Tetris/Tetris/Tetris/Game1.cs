@@ -44,11 +44,14 @@ namespace TetrisDemo
 
         int[,] Board;
         int[,] SpawnedPiece;
+        int[,] NextSpawnedPiece;
+        Vector2 NextSpawnedPieceLocation;
         Vector2 SpawnedPieceLocation;
         Vector2 BoardLocation;
         private Vector2 scoreLocation = new Vector2(225, 25);
         private Vector2 linesLocation = new Vector2(225, 50);
         private Vector2 levelLocation = new Vector2(225, 75);
+        private Vector2 nextpieceLocation = new Vector2(225, 100);
         private Vector2 titleScreenLocation = new Vector2(-450, -480);
 
 
@@ -148,6 +151,7 @@ namespace TetrisDemo
             // Reset the board
             InitializeBoard(Board);
             SpawnPiece();
+            SpawnPiece();  //spawn on deck piece
 
 
             base.Initialize();
@@ -204,14 +208,16 @@ namespace TetrisDemo
             int colr = rand.Next(0, pieces.Count);
 
             SpawnedPiece = (int[,])pieces[colr].Clone();
-
-            int dim = SpawnedPiece.GetLength(0);
+            SpawnedPiece = NextSpawnedPiece;
+            SpawnedPieceLocation = Vector2.Zero;
+            NextSpawnedPiece = (int[,])pieces[colr].Clone();
+            int dim = NextSpawnedPiece.GetLength(0);
 
             for (int x = 0; x < dim; x++)
                 for (int y = 0; y < dim; y++)
-                    SpawnedPiece[x, y] *= (colr + 1);
+                    NextSpawnedPiece[x, y] *= (colr + 1);
 
-            SpawnedPieceLocation = Vector2.Zero; // Temporary
+            NextSpawnedPieceLocation = new Vector2(11,6); // Temporary
         }
 
 
@@ -379,6 +385,7 @@ namespace TetrisDemo
                         {
                             SpawnedPieceLocation = NewSpawnedPieceLocation;
 
+
                         }
 
                         KeyBoardElapsedTime = 0;
@@ -482,9 +489,24 @@ namespace TetrisDemo
 
                         spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + x * BlockSize, (int)BoardLocation.Y + y * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
                     }
+                
+
+                //Next draw the on deck piece
+                int dim = NextSpawnedPiece.GetLength(0);
+
+                for(int y = 0; y < dim; y++)
+                    for (int x = 0; x < dim; x++)
+                    {
+                        if (NextSpawnedPiece[x, y] != 0)
+                        {
+                            Color tintColor = TetronimoColors[NextSpawnedPiece[x, y]];
+
+                            spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + ((int)NextSpawnedPieceLocation.X + x) * BlockSize, (int)BoardLocation.Y + ((int)NextSpawnedPieceLocation.Y + y) * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
+                        }
+                    }
 
                 // Next draw the spawned piece
-                int dim = SpawnedPiece.GetLength(0);
+                dim = SpawnedPiece.GetLength(0);
 
                 for (int y = 0; y < dim; y++)
                     for (int x = 0; x < dim; x++)
@@ -504,6 +526,14 @@ namespace TetrisDemo
                         scoreLocation,
                         Color.White);
                 }
+
+                
+                    spriteBatch.DrawString(
+                        pericles14,
+                        "Next Piece ",
+                        nextpieceLocation,
+                        Color.White);
+                
 
                 if (score.PlayerLines >= 0)
                 {

@@ -18,7 +18,7 @@ namespace TetrisDemo
         BLOCKED,
         OFFSCREEN
     }
-
+    
     enum GameStates { TitleScreen, Playing, GameOver };
 
     /// <summary>
@@ -33,12 +33,19 @@ namespace TetrisDemo
         GameStates gameState = GameStates.TitleScreen;
 
         Texture2D titleScreen;
+        Texture2D gamebackground;
+        Texture2D mainbackground;
+        Rectangle mainFrame;
         Texture2D spriteSheet;
         Score score;
         SpriteFont pericles14;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+
+            
+
+        
 
         List<int[,]> pieces;
 
@@ -81,6 +88,8 @@ namespace TetrisDemo
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+            graphics.PreferredBackBufferHeight = 440;
+            graphics.PreferredBackBufferWidth = 800;
             Board = new int[BoardWidth, BoardHeight];
             ElapsedTime = 0;
 
@@ -171,6 +180,9 @@ namespace TetrisDemo
             spriteSheet = Content.Load<Texture2D>(@"TetrisSprites");
             titleScreen = Content.Load<Texture2D>(@"tetristitle17");
             pericles14 = Content.Load<SpriteFont>("Pericles14");
+            mainbackground = Content.Load<Texture2D>("mainbackground");
+            gamebackground = Content.Load<Texture2D>("gamebackground");
+            mainFrame = new Rectangle(0,0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
 
             
@@ -192,7 +204,7 @@ namespace TetrisDemo
 
         public void InitializeBoard(int[,] board)
         {
-            BoardLocation = new Vector2(20, 20);
+            BoardLocation = new Vector2(300, 20);
 
             // Reset all board grid locations to empty
             for (int x = 0; x < BoardWidth; x++)
@@ -479,6 +491,14 @@ namespace TetrisDemo
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            if (gameState == GameStates.TitleScreen)
+            {
+                spriteBatch.Begin();
+                spriteBatch.Draw(mainbackground, mainFrame, Color.White);
+                spriteBatch.End();
+            }
+
+
             spriteBatch.Begin();
 
             if (gameState == GameStates.TitleScreen)
@@ -537,6 +557,10 @@ namespace TetrisDemo
                             spriteBatch.Draw(spriteSheet, new Rectangle((int)BoardLocation.X + ((int)SpawnedPieceLocation.X + x) * BlockSize, (int)BoardLocation.Y + ((int)SpawnedPieceLocation.Y + y) * BlockSize, BlockSize, BlockSize), new Rectangle(0, 0, 32, 32), tintColor);
                         }
                     }
+                spriteBatch.Begin();
+                spriteBatch.Draw(gamebackground, mainFrame, Color.White);
+                spriteBatch.End();
+
                 if (score.PlayerScore >= 0)
                 {
                     spriteBatch.DrawString(
